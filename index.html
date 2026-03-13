@@ -1,120 +1,33 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-<title>Fake Store</title>
-
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
-
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Fake Store</title>
+  <link rel="stylesheet" href="styles.css" />
 </head>
-
 <body>
+  <h1>Fake Online Store</h1>
 
-<h1>Fantasy Item Shop</h1>
+  <div id="products">
+    <h2>Products</h2>
+    <div>
+      <p>Product 1 - $10</p>
+      <button onclick="addToCart('Product 1', 10)">Buy</button>
+    </div>
+    <div>
+      <p>Product 2 - $20</p>
+      <button onclick="addToCart('Product 2', 20)">Buy</button>
+    </div>
+  </div>
 
-<div>
-<h3>Dragon Plush - 50 Gold</h3>
-<button onclick="addItem('Dragon Plush',50)">Add to Cart</button>
-</div>
+  <h2>Your Cart</h2>
+  <ul id="cart"></ul>
+  <button onclick="placeOrder()">Place Order</button>
 
-<div>
-<h3>Magic Potion - 25 Gold</h3>
-<button onclick="addItem('Magic Potion',25)">Add to Cart</button>
-</div>
+  <h2>All Orders</h2>
+  <div id="orders"></div>
 
-<div>
-<h3>Wizard Hat - 40 Gold</h3>
-<button onclick="addItem('Wizard Hat',40)">Add to Cart</button>
-</div>
-
-<h2>Cart</h2>
-
-<ul id="cart"></ul>
-
-Total: <span id="total">0</span> Gold
-
-<h2>Checkout</h2>
-
-Name  
-<input id="name">
-
-<br><br>
-
-Notes  
-<textarea id="notes"></textarea>
-
-<br><br>
-
-<button onclick="placeOrder()">Place Order</button>
-
-<script>
-
-const supabase = window.supabase.createClient(
-"https://hgajefemixmctbtpkwpu.supabase.co",
-"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhnYWplZmVtaXhtY3RidHBrd3B1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM0Mjc4NDMsImV4cCI6MjA4OTAwMzg0M30.st6stAUAZHmSZqT_KRFFgD2MkeTGdiqwOp3Ndb235rs"
-)
-
-let cart = []
-let total = 0
-
-function addItem(name,price){
-
-cart.push(name)
-total += price
-
-renderCart()
-
-}
-
-function renderCart(){
-
-const cartList = document.getElementById("cart")
-cartList.innerHTML = ""
-
-cart.forEach(item =>{
-
-let li = document.createElement("li")
-li.textContent = item
-cartList.appendChild(li)
-
-})
-
-document.getElementById("total").textContent = total
-
-}
-
-async function placeOrder(){
-
-const name = document.getElementById("name").value
-const notes = document.getElementById("notes").value
-
-const { data, error } = await supabase
-.from("orders")
-.insert([
-{
-name:name,
-items:cart.join(", "),
-total:total + " Gold",
-notes:notes
-}
-])
-
-if(error){
-
-alert("Error placing order")
-
-}else{
-
-alert("Order placed!")
-
-cart=[]
-total=0
-renderCart()
-
-}
-
-}
-
-</script>
-
+  <script src="app.js"></script>
 </body>
 </html>
