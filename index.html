@@ -28,6 +28,26 @@
   <h2>All Orders</h2>
   <div id="orders"></div>
 
-  <script src="app.js"></script>
+ <!-- Firebase SDKs -->
+<script src="https://www.gstatic.com/firebasejs/9.21.0/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.21.0/firebase-firestore.js"></script>
+
+<!-- Your Firebase Config and initialization -->
+<script>
+  // Your Firebase config object
+  const firebaseConfig = {
+    apiKey: "AIzaSyAU4t_i3js8O2pzqjv2iQd71hfQIA8mTI4",
+  authDomain: "lucky-scoops.firebaseapp.com",
+  projectId: "lucky-scoops",
+  storageBucket: "lucky-scoops.firebasestorage.app",
+  messagingSenderId: "749314696909",
+  appId: "1:749314696909:web:a3532aefb9b264ee8d6b84"
+  };
+  // Initialize Firebase
+  firebase.initializeApp(firebaseConfig);
+</script>
+
+<!-- Your app.js -->
+<script src="app.js"></script>
 </body>
 </html>
