@@ -1,43 +1,28 @@
-// Your Firebase config (replace with your actual config from Firebase project)
-const firebaseConfig = {
-  apiKey: "AIzaSyAU4t_i3js8O2pzqjv2iQd71hfQIA8mTI4",
-  authDomain: "lucky-scoops.firebaseapp.com",
-  projectId: "lucky-scoops",
-  storageBucket: "lucky-scoops.firebasestorage.app",
-  messagingSenderId: "749314696909",
-  appId: "1:749314696909:web:a3532aefb9b264ee8d6b84"
-};
-
-// Initialize Firebase
-firebase.initializeApp(firebaseConfig);
+// Your Firebase config and initialization (already included in your HTML, so you can remove it from `app.js`)
 const db = firebase.firestore();
 
 let cart = [];
 
-// Add product to cart
 function addToCart(name, price) {
   cart.push({ name, price });
   renderCart();
 }
 
-// Render cart items
 function renderCart() {
   const cartDiv = document.getElementById('cart');
   cartDiv.innerHTML = '';
-  cart.forEach((item, index) => {
+  cart.forEach((item) => {
     const li = document.createElement('li');
     li.textContent = `${item.name} - $${item.price}`;
     cartDiv.appendChild(li);
   });
 }
 
-// Place order
 function placeOrder() {
   if (cart.length === 0) {
     alert('Cart is empty!');
     return;
   }
-  // Save order to Firebase
   db.collection('orders').add({
     items: cart,
     timestamp: new Date()
@@ -49,7 +34,6 @@ function placeOrder() {
   });
 }
 
-// Fetch all orders
 function fetchOrders() {
   const ordersDiv = document.getElementById('orders');
   ordersDiv.innerHTML = '';
@@ -72,6 +56,4 @@ function fetchOrders() {
 
 // Load orders initially
 fetchOrders();
-
-// Optional: refresh orders every 10 seconds
 setInterval(fetchOrders, 10000);
