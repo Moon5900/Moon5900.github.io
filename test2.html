@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Storefront with Custom Colors</title>
+<style>
+  :root {
+    --button-color: #5c7457;
+    --segment-bg-color: #f5d0de;
+    --pop-color: #a8917e;
+  }
+
+  body { font-family: Arial, sans-serif; margin: 0; }
+
+  /* Main store area with background color for segments */
+  #store {
+    display: flex; flex-wrap: wrap; justify-content: center; margin: 20px;
+    background-color: var(--segment-bg-color);
+    padding: 10px;
+    border-radius: 8px;
+  }
+
+  /* Individual product styling */
+  .product { 
+    border: 1px solid #ccc; border-radius: 8px; padding: 10px; margin: 10px; width: 220px; text-align: center; background-color: #fff;
+  }
+  .product img { width: 100%; height: auto; border-radius: 8px; }
+
+  /* Buttons styled with your color scheme */
+  button {
+    margin-top: 10px; padding: 8px 12px; cursor: pointer; background-color: var(--button-color); color: #fff; border: none; border-radius: 4px;
+  }
+  button:hover { background-color: var(--pop-color); }
+
+  /* Cart styles with background color for segment */
+  #cart {
+    float: right; width: 350px; background-color: var(--segment-bg-color); padding: 10px; border-radius: 8px; margin: 20px;
+  }
+  #cart h2 { margin-top: 0; }
+  #cart-items { list-style: none; padding: 0; }
+
+  /* Style for the note label and textarea */
+  #noteLabel { display: block; margin-top: 10px; font-weight: bold; }
+  #note { width: 100%; height: 60px; margin-top: 5px; border: 1px solid #ccc; border-radius: 4px; }
+
+</style>
+</head>
+<body>
+<h1 style="text-align:center;">Whimical Lucky Scoops Store</h1>
+<div id="store"></div>
+
+<div id="cart">
+  <h2>Your Cart</h2>
+  <ul id="cart-items"></ul>
+  <label id="noteLabel" for="note">Add a note to your order:</label>
+  <textarea id="note" placeholder="Enter your note here..."></textarea>
+  <br>
+  <button id="placeOrder">Place Order</button>
+</div>
+
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-app.js";
+  import { getDatabase, ref, push, set } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-database.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyAU4t_i3js8O2pzqjv2iQd71hfQIA8mTI4",
+    authDomain: "lucky-scoops.firebaseapp.com",
+    projectId: "lucky-scoops",
+    storageBucket: "lucky-scoops.firebasestorage.app",
+    messagingSenderId: "749314696909",
+    appId: "1:749314696909:web:a3532aefb9b264ee8d6b84"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const db = getDatabase();
+
+  // Example product data
+  const products = [
+    { 
+      id: 'p1', 
+      name: 'Lucky Scoop (All Categories)', 
+      options: [
+        { label: '1 Scoop + 1 Gift', price: 49.90 },
+        { label: '2 Scoops + 2 Gifts', price: 99.80 },
+        { label: '3 Scoops + 3 Gifts & 1 Gacha', price: 148.80 },
+        { label: '5 Scoops + 5 Gifts & 1 Gacha', price: 248.80 },
+        { label: '6 Scoops + 6 Gifts & 2 Gacha', price: 298.80 }
+      ],
+      image: 'https://file.garden/abTG0YrZ2mxr3vTG/123.png'
+    },
+    { 
+      id: 'p2', 
+      name: 'Lucky Scoop (Only Stationary and Toys)', 
+      options: [
+        { label: '1 scoop + 2 gifts', price: 53.90 }
+      ],
+      image: 'https://file.garden/abTG0YrZ2mxr3vTG/122.png'
+    },
+    {
+        id: 'p3', 
+      name: 'Lucky Drawer (Color Themes)', 
+      options: [
+        { label: 'pink + 1 gift', price: 53.90 },
+        { label: 'green + 1 gift', price: 53.90 },
+        { label: 'yellow + 1 gift', price: 53.90 },
+        { label: 'blue + 1 gift', price: 53.90 },
+        { label: 'purple + 1 gift', price: 53.90 },
+      ],
+      image: 'https://file.garden/abTG0YrZ2mxr3vTG/111.png'
+    },
+    {
+        id: 'p4', 
+      name: 'Mystery Ball (GACHA)', 
+      options: [
+        { label: '5 Gachas', price: 69.90 }
+      ],
+      image: 'https://file.garden/abTG0YrZ2mxr3vTG/1.png'
+    },
+    {
+        id: 'p5', 
+      name: 'Video of Packing Your Order', 
+      options: [
+        { label:  '♡', price: 18.00}
+      ],
+      image: 'https://i.pinimg.com/736x/e4/06/19/e406192290967ba61e8277e7dbfde0a5.jpg'
+    },
+    {
+        id: 'p6', 
+      name: 'Lucky Hair Clip Bag - 10 bags + at least 2 gifts', 
+      options: [
+        { label:  'OUT OF STOCK :(', price: 25.00}
+      ],
+      image: 'https://file.garden/abTG0YrZ2mxr3vTG/3.png'
+    },
+    {
+        id: 'p7', 
+      name: 'Lucky Scrunchie Bag - 10 bags (at least 15 scrunchies) + 1 gift', 
+      options: [
+        { label:  'OUT OF STOCK :(', price: 21.90}
+      ],
+      image: 'https://file.garden/abTG0YrZ2mxr3vTG/4.png'
+    },
+    {
+        id: 'p8', 
+      name: 'Lucky Squishy Bags (big size)', 
+      options: [
+        { label:  'OUT OF STOCK :(', price: 39.90}
+      ],
+      image: 'https://file.garden/abTG0YrZ2mxr3vTG/5.png'
+    },
+    {
+        id: 'p9', 
+      name: 'Lucky Squishy Bags (mini size)', 
+      options: [
+        { label:  'OUT OF STOCK :(', price: 39.90}
+      ],
+      image: 'https://file.garden/abTG0YrZ2mxr3vTG/6.png'
+    },
+    // ... your other products ...
+  ];
+
+  const storeDiv = document.getElementById('store');
+  const cartUl = document.getElementById('cart-items');
+  const noteTextarea = document.getElementById('note');
+
+  let cart = [];
+
+  function renderProducts() {
+    products.forEach((product) => {
+      const pDiv = document.createElement('div');
+      pDiv.className = 'product';
+
+      // Select only labels
+      let optionsHTML = '<select class="optionSelect">';
+      product.options.forEach(opt => {
+        optionsHTML += `<option value="${opt.label}">${opt.label}</option>`;
+      });
+      optionsHTML += '</select>';
+
+      // Show initial price
+      const initialPrice = product.options[0].price;
+      const priceHTML = `<div class="priceDisplay">Price: $${initialPrice}</div>`;
+
+      pDiv.innerHTML = `
+        <img src="${product.image}" alt="${product.name}">
+        <h3>${product.name}</h3>
+        ${optionsHTML}
+        ${priceHTML}
+        <button>Add to Cart</button>
+      `;
+
+      const selectEl = pDiv.querySelector('.optionSelect');
+      const priceDiv = pDiv.querySelector('.priceDisplay');
+      const btn = pDiv.querySelector('button');
+
+      // Update price on change
+      selectEl.addEventListener('change', () => {
+        const selectedLabel = selectEl.value;
+        const selOpt = product.options.find(opt => opt.label === selectedLabel);
+        priceDiv.innerHTML = `Price: $${selOpt.price}`;
+      });
+
+      // Add to cart
+      btn.addEventListener('click', () => {
+        const selectedLabel = selectEl.value;
+        const selOpt = product.options.find(opt => opt.label === selectedLabel);
+        addToCart({
+          name: product.name + ' - ' + selectedLabel,
+          price: selOpt.price
+        });
+      });
+
+      storeDiv.appendChild(pDiv);
+    });
+  }
+
+  function addToCart(item) {
+    cart.push(item);
+    updateCart();
+  }
+
+  function updateCart() {
+    cartUl.innerHTML = '';
+    cart.forEach((item, i) => {
+      const li = document.createElement('li');
+      li.innerHTML = `${item.name} - $${item.price} <button data-index="${i}">Remove</button>`;
+      li.querySelector('button').addEventListener('click', () => {
+        cart.splice(i,1);
+        updateCart();
+      });
+      cartUl.appendChild(li);
+    });
+  }
+
+  document.getElementById('placeOrder').addEventListener('click', () => {
+    if (cart.length === 0) { alert('Your cart is empty!'); return; }
+    const orderRef = push(ref(db, 'orders'));
+    set(orderRef, {
+      items: cart,
+      note: noteTextarea.value,
+      timestamp: Date.now()
+    }).then(() => {
+      alert('Order placed successfully!');
+      cart = [];
+      updateCart();
+      noteTextarea.value = '';
+    }).catch(e => alert('Error: ' + e));
+  });
+
+  renderProducts();
+</script>
+</body>
+</html>
